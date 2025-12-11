@@ -1,14 +1,16 @@
 from pydantic import BaseModel, Field, field_validator
 import re
+from typing import List
 
 def clean_text(text: str):
     text_cleaned = re.sub(r'\s+', ' ', text).strip()
     return text_cleaned
 
 class QAPairModel(BaseModel):
-    expectedQuestion: str = Field(strip_whitespace=True, max_length=1000)
-    expectedAnswer: str = Field(strip_whitespace=True, max_length=1000)
     id: int = Field(gt=0)
+    expectedQuestion: str = Field(strip_whitespace=True, max_length=1000)
+    expectedAnswer: str = Field(strip_whitespace=True, max_length=5000)
+    
 
 
     @field_validator('expectedQuestion', 'expectedAnswer', mode='before')
@@ -34,4 +36,10 @@ class QAPairModel(BaseModel):
             raise ValueError(f"Resposta esperada \n'{answer}'\n tem menos de 10 palavras, muito pequena")
         return answer
 
+
+class QADataSet(BaseModel):
+    data: List[QAPairModel] = Field(default_factory=list)
+
+
+dataset = QADataSet()
 

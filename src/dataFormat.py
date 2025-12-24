@@ -8,8 +8,8 @@ def clean_text(text: str):
 
 class QAPairModel(BaseModel):
     id: int = Field(gt=0)
-    expectedQuestion: str = Field(strip_whitespace=True, max_length=1000)
-    expectedAnswer: str = Field(strip_whitespace=True, max_length=5000)
+    expectedQuestion: str = Field(strip_whitespace=True)
+    expectedAnswer: str = Field(strip_whitespace=True)
     
 
 
@@ -24,7 +24,7 @@ class QAPairModel(BaseModel):
 
         if not new_text:
             raise ValueError("O campo não pode ser vazio")
-        if new_text.lower() in ["não sei", "sem resposta"]:
+        if new_text.lower() in ["i don't know", "no response"]:
             raise ValueError("Placehorder invalido")
         
         return new_text

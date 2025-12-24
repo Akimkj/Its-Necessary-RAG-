@@ -1,16 +1,17 @@
 import json, os, dataFormat, time
 from google import genai
-from google.genai import types
+from google.genai import types, errors
 from pydantic import ValidationError
 
-DATASET_GEMINI_PATH = "datasets\geminiQA.json" #mudar nome
-TIME_BETWEEN_CALLS = 10
-client = genai.Client()
+DATASET_GEMINI_PATH = os.path.join("data", "gemini_dataset.json") #path de destino
+TIME_BETWEEN_CALLS = 10 #Espera (em segundos de cada solicitação)
+client = genai.Client() 
 
 
 def process_questions(goldenSet: list):
 
     # -- 1. LÓGICA DE PERSISTÊNCIA -- #
+    #verifica se o caminho de destino existe, se sim, carrega com os dados já existentes, se nao, carrega com o dataset vazio  
     if (os.path.exists(DATASET_GEMINI_PATH)):
         with open(DATASET_GEMINI_PATH, 'r', encoding='utf-8') as f:
             try:
@@ -23,14 +24,16 @@ def process_questions(goldenSet: list):
     else:
         datasetGemini = dataFormat.QADataSet()
 
+    #parte da lógica de persistencia
     processedIDs = {item.id for item in datasetGemini.data}
 
     # -- 2. Loop principal do algoritmo -- #
     for i, rawItem in enumerate(goldenSet):
 
-        currentID = rawItem.get('id') #verificar nome !!!!!!
-        questionText = rawItem.get('goldenQuestion') #verificar nome !!!!!!
+        currentID = rawItem.get('id') #id do item atual
+        questionText = rawItem.get('question') #questao do item atual 
 
+        #Pula se o id atual do goldenset ja foi processado pro geminiset
         if (currentID in processedIDs):
             continue
 
@@ -43,36 +46,43 @@ def process_questions(goldenSet: list):
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     system_instruction=[
-                        "Você é um especialista em Ciência da Computação e em documentação Python.", 
+                        "You are an expert in Computer Science and Python documentation.", 
                         
-                        "Responda a pergunta fornecida de forma completa, técnica e direta, mas sem introduções de 'Claro', 'tudo bem', 'com certeza' etc.",
+                        "Answer the given question completely, technically, and directly, but without introductions like 'Sure', 'okay', 'certainly', etc.",
 
-                        "Retorne APENAS um JSON válido com chaves: 'id': um inteiro que representa a identidade do par Pergunta-Resposta; 'expectedQuestion': uma string que será justamente a pergunta fornecida; 'expectedAnswer': uma string que será resposta retornada.",
+                        "Return ONLY a valid JSON with keys: 'id': an integer representing the identity of the Question-Answer pair; 'expectedQuestion': a string that will be the question provided; 'expectedAnswer': a string that will be the returned answer.",
                     ]
                 ),
-                contents=f"ID: {currentID}\n Pergunta fornecida: {questionText}"
+                contents=f"ID: {currentID}\n Question provided: {questionText}"
             )
 
             # -- 4. Validação e Parsing -- #
+            # carrega apenas o campo .text da resposta do gemini
             QApair_dict = json.loads(QApair.text)
 
+            #garante que o id do item atual pro geminiset sera o idCurrent do goldenset
             QApair_dict['id'] = currentID
 
+            #validação e parsing por meio do pydantic
             validatedEntry = dataFormat.QAPairModel(QApair_dict)
 
-            datasetGemini.data.append(validatedEntry)
-            processedIDs.add(currentID)
+            datasetGemini.data.append(validatedEntry) #add no datasetgemini
+            processedIDs.add(currentID) #o id atual entra nos processados
             print(f"ID {currentID} Feito com sucesso")
 
+        #verificações de erros
         except json.decoder.JSONDecodeError:
             print(f"ID {currentID}: Gemini retornou um JSON inválido.")
         except ValidationError as e:
             print(f"ID {currentID}: Erro de validação Pydantic: {e}")
+        except errors.RateLimitError:
+            print("Limite rate atingido, esperado 60 segundos...")
+            time.sleep(60)
         except Exception as e:
             print(f"ID {currentID}: Erro desconhecido: {e}")
 
 
-        # -- 5. Salvamento interminente
+        # -- 5. Salvamento interminente -- #
         # O salvamento no dataset Gemini ocorre a cada 5 pares (sucesso ou falha)
         if (i + 1) % 5 == 0:
             with open(DATASET_GEMINI_PATH, 'w', encoding='utf-8') as f:

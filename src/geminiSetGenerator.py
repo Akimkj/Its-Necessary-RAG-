@@ -1,4 +1,5 @@
-import json, os, dataFormat, time
+import json, os, time
+from . import dataFormat
 from google import genai
 from google.genai import types, errors
 from pydantic import ValidationError
@@ -35,6 +36,7 @@ def process_questions(goldenSet: list):
 
         #Pula se o id atual do goldenset ja foi processado pro geminiset
         if (currentID in processedIDs):
+            print(f"ID {currentID} já foi processado")
             continue
 
         print(f"{currentID} Processando com gemini...")
@@ -64,7 +66,7 @@ def process_questions(goldenSet: list):
             QApair_dict['id'] = currentID
 
             #validação e parsing por meio do pydantic
-            validatedEntry = dataFormat.QAPairModel(QApair_dict)
+            validatedEntry = dataFormat.QAPairModel(**QApair_dict)
 
             datasetGemini.data.append(validatedEntry) #add no datasetgemini
             processedIDs.add(currentID) #o id atual entra nos processados
@@ -75,22 +77,28 @@ def process_questions(goldenSet: list):
             print(f"ID {currentID}: Gemini retornou um JSON inválido.")
         except ValidationError as e:
             print(f"ID {currentID}: Erro de validação Pydantic: {e}")
-        except errors.RateLimitError:
-            print("Limite rate atingido, esperado 60 segundos...")
+        except errors.APIError as e:
+            print(f"ID {currentID}: Erro da API Gemini: {e}")
             time.sleep(60)
         except Exception as e:
             print(f"ID {currentID}: Erro desconhecido: {e}")
 
 
-        # -- 5. Salvamento interminente -- #
+        # -- 5. Salvamento intermitente -- #
         # O salvamento no dataset Gemini ocorre a cada 5 pares (sucesso ou falha)
         if (i + 1) % 5 == 0:
+            print(f"Salvando dados no {DATASET_GEMINI_PATH}")
             with open(DATASET_GEMINI_PATH, 'w', encoding='utf-8') as f:
                 f.write(datasetGemini.model_dump_json(indent=2))
         
         time.sleep(TIME_BETWEEN_CALLS)
 
+    #Ordenando todos os dados por meio do ID
+    datasetGemini.data.sort(key=lambda x: x.id)
+
+    #Ultimo salvamento de todos os dados prontos e ordenados
     with open(DATASET_GEMINI_PATH, 'w', encoding='utf-8') as f:
         f.write(datasetGemini.model_dump_json(indent=2))
 
+    
 

@@ -1,10 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
-import re
+from src.utils import clean_text 
 from typing import List
 
-def clean_text(text: str):
-    text_cleaned = re.sub(r'\s+', ' ', text).strip()
-    return text_cleaned
 
 class QAPairModel(BaseModel):
     id: int = Field(gt=0)

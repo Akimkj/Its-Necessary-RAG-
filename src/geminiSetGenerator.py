@@ -3,27 +3,31 @@ from . import dataFormat
 from google import genai
 from google.genai import types, errors
 from pydantic import ValidationError
+from src.utils import loadData
 
 DATASET_GEMINI_PATH = os.path.join("data", "gemini_dataset.json") #path de destino
 TIME_BETWEEN_CALLS = 10 #Espera (em segundos de cada solicitação)
 client = genai.Client() 
 
 
+
+
 def process_questions(goldenSet: list):
 
     # -- 1. LÓGICA DE PERSISTÊNCIA -- #
-    #verifica se o caminho de destino existe, se sim, carrega com os dados já existentes, se nao, carrega com o dataset vazio  
-    if (os.path.exists(DATASET_GEMINI_PATH)):
-        with open(DATASET_GEMINI_PATH, 'r', encoding='utf-8') as f:
-            try:
+    #Carrega os dados existentes no caminho informado  
+    rawData = loadData(DATASET_GEMINI_PATH)
 
-                rawData = json.load(f)
-                datasetGemini = dataFormat.QADataSet(**rawData)
-            except (json.decoder.JSONDecodeError, ValidationError):
-                print("Arquivo corrompido ou vazio, criando um dataset novo vazio...")
-                datasetGemini = dataFormat.QADataSet()
-    else:
+    if not rawData: #se não existir dados, carrega um dataset vazio
+        print("Criando novo dataset vazio...")
         datasetGemini = dataFormat.QADataSet()
+    else:
+        try: #Se existir dados, carrega um dataset com os dados ja existentes
+            datasetGemini = dataFormat.QADataSet(**rawData)
+        except ValidationError:
+            print("Arquivo com formato inválido, resetando...")
+            datasetGemini = dataFormat.QADataSet()
+    
 
     #parte da lógica de persistencia
     processedIDs = {item.id for item in datasetGemini.data}

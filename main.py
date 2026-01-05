@@ -1,23 +1,10 @@
 from src.geminiSetGenerator import process_questions
-import os, json
+from src.utils import loadData
+import os
 
-GOLDENSET_PATH = os.path.join("data", "stackoverflow_dataset.json") 
+PATH_GOLDENSET = os.path.join("data", "stackoverflow_dataset.json")
 
-def loadData(filePath: str):
-    
-    try:
-        with open(filePath, 'r', encoding='utf-8') as f:
-            dataset = json.load(f)
-            print("[MAIN] - dataset carregado")
-            return dataset
-    except FileNotFoundError:
-        print(f"Arquivo {filePath} não encontrado")
-        return []
-    except json.JSONDecodeError:
-        print(f"Erro ao decodificar JSON do arquivo {filePath}")
-        return []
+rawgolden = loadData(PATH_GOLDENSET, default_type=list)
 
-goldenSet = loadData(GOLDENSET_PATH)
-
-if (goldenSet):
-    process_questions(goldenSet)
+if rawgolden:
+    process_questions(rawgolden)   

@@ -1,10 +1,10 @@
 import json, os, time
-from . import dataFormat
+from . import dataFormat, utils
 from google import genai
 from google.genai import types, errors
 from pydantic import ValidationError
 
-DATASET_GEMINI_PATH = os.path.join("data", "gemini_dataset.json") #path de destino
+DATASET_GEMINI_PATH = os.path.join("data", "gemini_dataset_v2.json") #path de destino
 TIME_BETWEEN_CALLS = 10 #Espera (em segundos de cada solicitação)
 client = genai.Client() 
 
@@ -12,18 +12,19 @@ client = genai.Client()
 def process_questions(goldenSet: list):
 
     # -- 1. LÓGICA DE PERSISTÊNCIA -- #
-    #verifica se o caminho de destino existe, se sim, carrega com os dados já existentes, se nao, carrega com o dataset vazio  
-    if (os.path.exists(DATASET_GEMINI_PATH)):
-        with open(DATASET_GEMINI_PATH, 'r', encoding='utf-8') as f:
-            try:
+    #Carrega os dados existentes no caminho informado  
+    rawData = utils.loadData(DATASET_GEMINI_PATH)
 
-                rawData = json.load(f)
-                datasetGemini = dataFormat.QADataSet(**rawData)
-            except (json.decoder.JSONDecodeError, ValidationError):
-                print("Arquivo corrompido ou vazio, criando um dataset novo vazio...")
-                datasetGemini = dataFormat.QADataSet()
-    else:
+    if not rawData: #se não existir dados, carrega um dataset vazio
+        print("Criando novo dataset vazio...")
         datasetGemini = dataFormat.QADataSet()
+    else:
+        try: #Se existir dados, carrega um dataset com os dados ja existentes
+            datasetGemini = dataFormat.QADataSet(**rawData)
+        except ValidationError:
+            print("Arquivo com formato inválido, resetando...")
+            datasetGemini = dataFormat.QADataSet()
+    
 
     #parte da lógica de persistencia
     processedIDs = {item.id for item in datasetGemini.data}
@@ -48,11 +49,13 @@ def process_questions(goldenSet: list):
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     system_instruction=[
-                        "You are an expert in Computer Science and Python documentation.", 
+                        "You are a Senior Computer Science Professor and Python Core Developer specializing in technical documentation.", 
                         
-                        "Answer the given question completely, technically, and directly, but without introductions like 'Sure', 'okay', 'certainly', etc.",
+                        "Your goal is to provide a comprehensive, thorough, academic, and complete technical explanation of the proposed question. The answer should be at least 300 words to ensure depth.",
 
-                        "Return ONLY a valid JSON with keys: 'id': an integer representing the identity of the Question-Answer pair; 'expectedQuestion': a string that will be the question provided; 'expectedAnswer': a string that will be the returned answer.",
+                        "CONSTRAINTS: 1. DO NOT use Markdown formatting (no bold '**', no italics '*', no headers '#'). Use plain text only. 2. For code examples, write them inline or in plain text blocks without backticks. 3. DO NOT use introductory phrases or conversational fillers. 4. Structure the response with clear logical paragraphs instead of bullet points. 5. Focus on the internal mechanics of Python (CPython implementation, memory management, or execution flow) whenever applicable.",
+
+                        "Return ONLY a valid JSON with keys: 'id': integer; 'question': string (exactly as provided); 'answer': string (the full, plain-text technical explanation).",
                     ]
                 ),
                 contents=f"ID: {currentID}\n Question provided: {questionText}"
@@ -73,8 +76,8 @@ def process_questions(goldenSet: list):
             print(f"ID {currentID} Feito com sucesso")
 
         #verificações de erros
-        except json.decoder.JSONDecodeError:
-            print(f"ID {currentID}: Gemini retornou um JSON inválido.")
+        except json.decoder.JSONDecodeError as e:
+            print(f"ID {currentID}: Gemini retornou um JSON inválido: {e}")
         except ValidationError as e:
             print(f"ID {currentID}: Erro de validação Pydantic: {e}")
         except errors.APIError as e:

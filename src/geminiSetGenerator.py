@@ -1,5 +1,5 @@
 import json, os, time
-import dataFormat, utils
+from . import dataFormat, utils
 from google import genai
 from google.genai import types, errors
 from pydantic import ValidationError
@@ -76,8 +76,8 @@ def process_questions(goldenSet: list):
             print(f"ID {currentID} Feito com sucesso")
 
         #verificações de erros
-        except json.decoder.JSONDecodeError:
-            print(f"ID {currentID}: Gemini retornou um JSON inválido.")
+        except json.decoder.JSONDecodeError as e:
+            print(f"ID {currentID}: Gemini retornou um JSON inválido: {e}")
         except ValidationError as e:
             print(f"ID {currentID}: Erro de validação Pydantic: {e}")
         except errors.APIError as e:

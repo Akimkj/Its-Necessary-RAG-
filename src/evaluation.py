@@ -6,7 +6,7 @@ import dataFormat, utils
 
 #carrega os caminhos dos datasets
 PATH_GOLDENSET = os.path.join("data", "stackoverflow_dataset.json") 
-PATH_GEMINISET = os.path.join("data", "gemini_dataset_v1.json")
+PATH_GEMINISET = os.path.join("data", "gemini_dataset_v2.json")
 
 #Carrega os dados dos datasets da forma que estão disponíveis
 rawGolden = utils.loadData(PATH_GOLDENSET, default_type=list)
@@ -44,16 +44,16 @@ for gold in goldenset.data:
         results.append({
             "id": geminiItem.id,
             "question": geminiItem.question,
-            "bert_precision": P.item(),
-            "bert_recall": R.item(),
-            "bert_F1": F1.item()
+            "bert_precision": round(P.item(), 4),
+            "bert_recall": round(R.item(), 4),
+            "bert_F1": round(F1.item(), 4)
         })
     else:
-        print("Não foi achado o id correspondente...")
+        print("Não foi achado o ID correspondente...")
 
 #Carrega a lista de resultados em DataFrame para transformar em .csv
 df = pd.DataFrame(results)
-outputPath = os.path.join("results", "avBert_gemini_v1.csv")
+outputPath = os.path.join("results", "avBert_gemini_v2.csv")
 df.to_csv(outputPath, index=False, encoding='utf-8')
 
 

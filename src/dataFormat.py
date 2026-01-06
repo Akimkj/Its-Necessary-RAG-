@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-import utils 
+from . import utils 
 from typing import List
 
 

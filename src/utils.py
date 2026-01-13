@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import json, re, os
 import pandas as pd
+from google import genai
+from google.genai import types, errors
+
+client = genai.Client() 
 
 def clean_text(text: str):
     text_cleaned = re.sub(r'\s+', ' ', text).strip()
@@ -35,3 +39,19 @@ def bertCompareGraph(df1, df2):
 
     plt.savefig(pathResult, dpi=300, bbox_inches='tight')
     plt.show()
+
+
+def callApiGemini(currID: int, question):
+    result = client.models.generate_content(
+                model="gemini-2.5-flash",
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    system_instruction=[
+                        "You are an expert in Computer Science and Python documentation.", 
+                        "Answer the given question completely, technically, and directly, but without introductions like 'Sure', 'okay', 'certainly', etc.",
+                        "Return ONLY a valid JSON with keys: 'id': an integer representing the identity of the Question-Answer pair; 'expectedQuestion': a string that will be the question provided; 'expectedAnswer': a string that will be the returned answer."
+                    ]
+                ),
+                contents=f"ID: {currID}\n Question provided: {question}"
+            )
+    return result

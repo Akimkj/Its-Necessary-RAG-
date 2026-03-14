@@ -1,8 +1,36 @@
 # Its-Necessary-RAG-?
-O objetivo desta pesquisa é definir se é realmente necessário o uso de RAG na geração de respostas com base em documentações em comparação com o uso das LLM's.
+Projeto de Iniciação Científica focada na questão: É realmente necessário o uso de RAG na geração de respostas com base na documentação da linguagem Python, em comparação com o uso das LLM's?
 
 
-## Prompts
+## Como executar o programa
+
+### 1. pré-requisitos
+* Python 3.10 ou superior instalado.
+
+### 2. Configuração do ambiente
+* Primeiro, clone o repositório e crie o ambiente virtual:
+
+```bash
+python -m venv .venv
+```
+
+* Ative o ambiente virtual:
+
+  * Windows: ```.\.venv\Scripts\activate```
+  * Linux/MAC: ```source .venv/bin/activate```
+
+  **OBS1**: Para desativar posteriormente o ambiente virtual: ```deactivate```
+
+* Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+
+**OBS2**: O código-fonte foi refatorado de forma que a execução precise ser feita dentro do arquivo main.py
+
+
+
+## Prompts (campo temporario)
 Neste tópico, será mostrado os prompts usados para a geração das respostas geradas (tanto a versão com ou sem RAG):
 
 1. Versão 1

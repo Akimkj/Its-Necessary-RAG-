@@ -1,32 +1,28 @@
 import matplotlib.pyplot as plt
 import json, re, os
 import pandas as pd
-from google import genai
-from google.genai import types, errors
-
-client = genai.Client() 
 
 def clean_text(text: str):
     text_cleaned = re.sub(r'\s+', ' ', text).strip()
     return text_cleaned
 
 
-def loadData(filePath: str, default_type=dict):
+def loadData(filePath: str, default_type=list):
     try:
         with open(filePath, 'r', encoding='utf-8') as f:
-            dataset = json.load(f)
-            print("[MAIN] - dataset carregado")
-            return dataset
-    except FileNotFoundError:
-        print(f"Arquivo {filePath} não encontrado")
-        return default_type()
-    except json.JSONDecodeError:
-        print(f"Erro ao decodificar JSON do arquivo {filePath}")
+            content = json.load(f)
+            
+            if (isinstance(content, dict)):
+                return content.get("data", [])
+            else:
+                return content
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Erro ao carregar dados de {filePath}: {e}")
         return default_type()
 
 
 def bertCompareGraph(df1, df2):
-    pathResult = os.path.join("results", "avBert_prompt_compare.png")
+    pathResult = os.path.join("results", "plots", "avBert_prompt_compare.png")
 
     cleanV1 = df1[['id', 'bert_F1']].rename(columns={'bert_F1': 'F1_v1'})
     cleanV2 = df2[['id', 'bert_F1']].rename(columns={'bert_F1': 'F1_v2'})
@@ -41,17 +37,4 @@ def bertCompareGraph(df1, df2):
     plt.show()
 
 
-def callApiGemini(currID: int, question):
-    result = client.models.generate_content(
-                model="gemini-2.5-flash",
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    system_instruction=[
-                        "You are an expert in Computer Science and Python documentation.", 
-                        "Answer the given question completely, technically, and directly, but without introductions like 'Sure', 'okay', 'certainly', etc.",
-                        "Return ONLY a valid JSON with keys: 'id': an integer representing the identity of the Question-Answer pair; 'expectedQuestion': a string that will be the question provided; 'expectedAnswer': a string that will be the returned answer."
-                    ]
-                ),
-                contents=f"ID: {currID}\n Question provided: {question}"
-            )
-    return result
+

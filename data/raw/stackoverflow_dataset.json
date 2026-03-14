@@ -1,4 +1,5 @@
-[
+{
+  "data": [
   {
     "id": 1,
     "question": "What does the \"yield\" keyword do in Python?",
@@ -450,3 +451,4 @@
     "answer": "Use isinstance to check if o is an instance of str or any subclass of str: if isinstance(o, str): To check if the type of o is exactly str, excluding subclasses of str: if type(o) is str: See Built-in Functions in the Python Library Reference for relevant information. Checking for strings in Python 2 For Python 2, this is a better way to check if o is a string: if isinstance(o, basestring): because this will also catch Unicode strings. unicode is not a subclass of str; both str and unicode are subclasses of basestring. In Python 3, basestring no longer exists since there's a strict separation of strings (str) and binary data (bytes). Alternatively, isinstance accepts a tuple of classes. This will return True if o is an instance of any subclass of any of (str, unicode): if isinstance(o, (str, unicode)):"
   }
 ]
+}

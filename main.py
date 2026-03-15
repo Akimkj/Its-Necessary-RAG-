@@ -1,10 +1,36 @@
-from src.geminiSetGenerator import process_questions
-from src.utils import loadData
+from src.utils import loadData, bertCompareGraph
+from src.generator import process_questions
 import os
+from src.evaluation import bertEvaluation
+import pandas as pd
 
-PATH_GOLDENSET = os.path.join("data", "stackoverflow_dataset.json")
+#carrega os caminhos dos datasets // alterar posteriormente
+PATH_GOLDENSET = os.path.join("data", "raw", "stackoverflow_dataset.json") 
+PATH_GEMINISET = os.path.join("data", "processed", "gemini_dataset_v2.json")
+PATH_GEMINIBERT1 = os.path.join("results", "csv", "avBert_gemini_v1.csv")
+PATH_GEMINIBERT2 = os.path.join("results", "csv", "avBert_gemini_v2.csv")
 
-rawgolden = loadData(PATH_GOLDENSET, default_type=list)
 
-if rawgolden:
-    process_questions(rawgolden)   
+
+print("MENU - ARTIGO RAG")
+while(True):
+    print("1 - Gerar novo dataset")
+    print("2 - Compara dataset com Goldenset")
+    print("3 - Criar gráficos de comparação")
+    op = int(input("Opção: "))
+
+    if (op == 1):
+        rawGolden = loadData(PATH_GOLDENSET)
+        process_questions(rawGolden, PATH_GEMINISET)
+    elif (op == 2):
+        rawGolden = loadData(PATH_GOLDENSET)
+        rawDataset = loadData(PATH_GEMINISET)
+        bertEvaluation(rawDataset, rawGolden)
+    elif (op == 3):
+        df1 = pd.read_csv(PATH_GEMINIBERT1)
+        df2 = pd.read_csv(PATH_GEMINIBERT2)
+
+        bertCompareGraph(df1, df2)
+
+
+

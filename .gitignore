@@ -1,15 +1,11 @@
 #Cache de compilação
-**/__pycache__/
+**/__pycache__
 __pycache__/*
 
 #Ambiente virtual
 venv/
 .venv/
-env/
-
-#resultados 
-results/csv/*.csv
-results/plots/*.png
+.env
 
 #IDE 
 .vscode/

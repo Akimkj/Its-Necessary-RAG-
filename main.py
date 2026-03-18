@@ -6,9 +6,9 @@ import pandas as pd
 
 #carrega os caminhos dos datasets // alterar posteriormente
 PATH_GOLDENSET = os.path.join("data", "raw", "stackoverflow_dataset.json") 
-PATH_GEMINISET = os.path.join("data", "processed", "gemini_dataset_v2.json")
-PATH_GEMINIBERT1 = os.path.join("results", "csv", "avBert_gemini_v1.csv")
-PATH_GEMINIBERT2 = os.path.join("results", "csv", "avBert_gemini_v2.csv")
+PATH_DATASET = os.path.join("data", "processed", "gemini_dataset.json")
+PATH_DATASETBERT1 = os.path.join("results", "csv", "avBert_gemini_v1.csv")
+PATH_DATASETBERT2 = os.path.join("results", "csv", "avBert_gemini_v2.csv")
 
 
 
@@ -21,14 +21,14 @@ while(True):
 
     if (op == 1):
         rawGolden = loadData(PATH_GOLDENSET)
-        process_questions(rawGolden, PATH_GEMINISET)
+        process_questions(rawGolden, PATH_DATASET)
     elif (op == 2):
         rawGolden = loadData(PATH_GOLDENSET)
-        rawDataset = loadData(PATH_GEMINISET)
+        rawDataset = loadData(PATH_DATASET)
         bertEvaluation(rawDataset, rawGolden)
     elif (op == 3):
-        df1 = pd.read_csv(PATH_GEMINIBERT1)
-        df2 = pd.read_csv(PATH_GEMINIBERT2)
+        df1 = pd.read_csv(PATH_DATASETBERT1)
+        df2 = pd.read_csv(PATH_DATASETBERT2)
 
         bertCompareGraph(df1, df2)
 

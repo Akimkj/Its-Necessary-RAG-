@@ -45,8 +45,9 @@ def bertEvaluation(rawCandidate: list, rawGolden: list) -> Dataframe:
 
     df = pd.DataFrame(results)
     #Mudar o nome do arquivo para outras comparações
-    outputPath = os.path.join("results", "csv", "avBert_gemini_v2.csv")  
+    outputPath = os.path.join("results", "csv", "avBert_gemini.csv")
     df.to_csv(outputPath, index=False, encoding='utf-8')
+
 
     return df
 

@@ -4,7 +4,7 @@ import pandas as pd
 import os
 from . import dataFormat
 
-def bertEvaluation(rawCandidate: list, rawGolden: list) -> Dataframe:
+def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str = None):
 
     #Padroniza a estrutura de ambos os datasets com pydantic
     goldenset = dataFormat.QADataSet(data=rawGolden)
@@ -18,9 +18,12 @@ def bertEvaluation(rawCandidate: list, rawGolden: list) -> Dataframe:
 
 
     results = []
+    total = len(goldenset.data)
+    print(f"\nIniciando avaliação de {total} questões usando BERTscore...")
 
     #Loop principal que percorre a lista goldenset
-    for gold in goldenset.data:
+    for idx, gold in enumerate(goldenset.data, 1):
+        print(f"Processando questão {idx}/{total}...", end='\r')
 
         #Procura o item do geminiset que tenha o mesmo id do item do goldenset
         candidateItem = next((item for item in candidateset.data if item.id == gold.id), None)
@@ -41,11 +44,14 @@ def bertEvaluation(rawCandidate: list, rawGolden: list) -> Dataframe:
                 "bert_F1": round(F1.item(), 4)
             })
         else:
-            print("Não foi achado o ID correspondente...")
+            print(f"\nNão foi achado o ID correspondente para a questão {gold.id}...")
+            
+    print("\n\nAvaliação concluída com sucesso!")
 
     df = pd.DataFrame(results)
-    #Mudar o nome do arquivo para outras comparações
-    outputPath = os.path.join("results", "csv", "avBert_gemini_v2.csv")  
+    if outputPath is None:
+        outputPath = os.path.join("results", "csv", "avBert_gemini_v2.csv")  
+    os.makedirs(os.path.dirname(outputPath), exist_ok=True)
     df.to_csv(outputPath, index=False, encoding='utf-8')
 
     return df

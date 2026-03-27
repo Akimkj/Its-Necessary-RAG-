@@ -2,6 +2,7 @@ import json, time
 from operator import attrgetter
 from . import dataFormat, utils
 from src.services.gemini_service import callApiGemini
+from src.services.claude_service import callApiClaude
 from google.genai import errors
 from pydantic import ValidationError
 
@@ -9,7 +10,7 @@ from pydantic import ValidationError
 TIME_BETWEEN_CALLS = 10
 
 
-def process_questions(goldenSet: list, pathCandidate: str):
+def process_questions(goldenSet: list, pathCandidate: str, model_engine: str = "gemini"):
 
     #1. LÓGICA DE PERSISTÊNCIA
     #Carrega os dados existentes no caminho informado  
@@ -40,11 +41,14 @@ def process_questions(goldenSet: list, pathCandidate: str):
             print(f"ID {currentID} já foi processado")
             continue
 
-        print(f"{currentID} Processando com gemini...")
+        print(f"{currentID} Processando com {model_engine}...")
 
         try:
             # 3. Chamada da Api
-            QApair = callApiGemini(currentID, questionText)
+            if model_engine == "claude":
+                QApair = callApiClaude(currentID, questionText)
+            else:
+                QApair = callApiGemini(currentID, questionText)
 
             clean_json = QApair.strip().replace("```json", "").replace("```", "")
 
@@ -80,6 +84,8 @@ def process_questions(goldenSet: list, pathCandidate: str):
     #Ultimo salvamento de todos os dados prontos e ordenados
     with open(pathCandidate, 'w', encoding='utf-8') as f:
         f.write(candidateSet.model_dump_json(indent=2))
+
+    
 
     
 

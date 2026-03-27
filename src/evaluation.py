@@ -49,10 +49,16 @@ def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str = None):
     print("\n\nAvaliação concluída com sucesso!")
 
     df = pd.DataFrame(results)
+<<<<<<< mika
+    #Mudar o nome do arquivo para outras comparações
+    outputPath = os.path.join("results", "csv", "avBert_gemini.csv")
+=======
     if outputPath is None:
         outputPath = os.path.join("results", "csv", "avBert_gemini_v2.csv")  
     os.makedirs(os.path.dirname(outputPath), exist_ok=True)
+>>>>>>> main
     df.to_csv(outputPath, index=False, encoding='utf-8')
+
 
     return df
 

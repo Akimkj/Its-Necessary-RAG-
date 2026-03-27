@@ -1,8 +1,12 @@
 import json, time
 from operator import attrgetter
 from . import dataFormat, utils
+<<<<<<< mika
+from src.services import openai_service, gemini_service
+=======
 from src.services.gemini_service import callApiGemini
 from src.services.claude_service import callApiClaude
+>>>>>>> main
 from google.genai import errors
 from pydantic import ValidationError
 
@@ -41,6 +45,13 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str = "
             print(f"ID {currentID} já foi processado")
             continue
 
+<<<<<<< mika
+        print(f"{currentID} Processando...")
+
+        try:
+            # 3. Chamada da Api
+            QApair = openai_service.callApi(currentID, questionText)
+=======
         print(f"{currentID} Processando com {model_engine}...")
 
         try:
@@ -49,6 +60,7 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str = "
                 QApair = callApiClaude(currentID, questionText)
             else:
                 QApair = callApiGemini(currentID, questionText)
+>>>>>>> main
 
             clean_json = QApair.strip().replace("```json", "").replace("```", "")
 

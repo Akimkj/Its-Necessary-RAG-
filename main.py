@@ -10,11 +10,17 @@ import pandas as pd
 
 #carrega os caminhos dos datasets // alterar posteriormente
 PATH_GOLDENSET = os.path.join("data", "raw", "stackoverflow_dataset.json") 
+<<<<<<< mika
+PATH_DATASET = os.path.join("data", "processed", "gemini_dataset.json")
+PATH_DATASETBERT1 = os.path.join("results", "csv", "avBert_gemini_v1.csv")
+PATH_DATASETBERT2 = os.path.join("results", "csv", "avBert_gemini_v2.csv")
+=======
 PATH_GEMINISET = os.path.join("data", "processed", "gemini_dataset_v2.json")
 PATH_GEMINIBERT1 = os.path.join("results", "csv", "avBert_gemini_v1.csv")
 PATH_GEMINIBERT2 = os.path.join("results", "csv", "avBert_gemini_v2.csv")
 PATH_CLAUDESET = os.path.join("data", "processed", "claude_dataset.json")
 PATH_CLAUDEBERT = os.path.join("results", "csv", "avBert_claude.csv")
+>>>>>>> main
 
 
 
@@ -31,12 +37,16 @@ while(True):
         print("2 - Claude")
         mod_op = int(input("Opção: "))
         rawGolden = loadData(PATH_GOLDENSET)
+<<<<<<< mika
+        process_questions(rawGolden, PATH_DATASET)
+=======
         
         if mod_op == 2:
             process_questions(rawGolden, PATH_CLAUDESET, "claude")
         else:
             process_questions(rawGolden, PATH_GEMINISET, "gemini")
             
+>>>>>>> main
     elif (op == 2):
         print("Qual dataset deseja avaliar?")
         print("1 - Gemini")
@@ -44,6 +54,13 @@ while(True):
         mod_op = int(input("Opção: "))
         
         rawGolden = loadData(PATH_GOLDENSET)
+<<<<<<< mika
+        rawDataset = loadData(PATH_DATASET)
+        bertEvaluation(rawDataset, rawGolden)
+    elif (op == 3):
+        df1 = pd.read_csv(PATH_DATASETBERT1)
+        df2 = pd.read_csv(PATH_DATASETBERT2)
+=======
         if mod_op == 2:
             rawDataset = loadData(PATH_CLAUDESET)
             bertEvaluation(rawDataset, rawGolden, PATH_CLAUDEBERT)
@@ -64,6 +81,7 @@ while(True):
             df2 = pd.read_csv(PATH_GEMINIBERT2)
         else:
             print(f"Aviso: Dataset Versão 2 não encontrado ({PATH_GEMINIBERT2})")
+>>>>>>> main
 
         bertCompareGraph(df1, df2)
 

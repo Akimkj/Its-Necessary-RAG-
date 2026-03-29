@@ -4,7 +4,6 @@ load_dotenv()
 
 from src.utils import loadData, bertCompareGraph
 from src.generator import process_questions
-import os
 from src.evaluation import bertEvaluation
 import pandas as pd
 
@@ -16,6 +15,8 @@ PATH_GEMINIBERT = os.path.join("results", "csv", "avBert_gemini.csv")
 
 PATH_CLAUDESET = os.path.join("data", "processed", "claude_dataset.json")
 PATH_CLAUDEBERT = os.path.join("results", "csv", "avBert_claude.csv")
+PATH_DEEPSEEKSET = os.path.join("data", "processed", "deepseek_dataset.json")
+PATH_DEEPSEEKBERT = os.path.join("results", "csv", "avBert_deepseek.csv")
 
 PATH_OPENAISET = os.path.join("data", "processed", "openai_dataset.json")
 PATH_OPENAIBERT = os.path.join("results", "csv", "avBert_openai.csv")
@@ -26,9 +27,10 @@ PATH_OPENAIBERT = os.path.join("results", "csv", "avBert_openai.csv")
 
 print("MENU - ARTIGO RAG")
 while(True):
-    print("1 - Gerar novo dataset")
+    print("\n1 - Gerar novo dataset")
     print("2 - Compara dataset com Goldenset")
     print("3 - Criar gráficos de comparação")
+    print("4 - Sair")
     op = int(input("Opção: "))
 
     if (op == 1):
@@ -36,6 +38,7 @@ while(True):
         print("1 - Gemini")
         print("2 - Claude")
         print("3 - OpenAi")
+        print("4 - DeepSeek")
         mod_op = int(input("Opção: "))
         rawGolden = loadData(PATH_GOLDENSET)
         if mod_op == 1:
@@ -43,25 +46,32 @@ while(True):
         elif mod_op == 2:
             process_questions(rawGolden, PATH_CLAUDESET, "claude")
         elif mod_op == 3:
-            process_questions(rawGolden, PATH_OPENAI, "openai")
+            process_questions(rawGolden, PATH_OPENAISET, "openai")
+        elif mod_op == 4:
+            process_questions(rawGolden, PATH_DEEPSEEKSET, "deepseek")
             
     elif (op == 2):
         print("Qual dataset deseja avaliar?")
         print("1 - Gemini")
         print("2 - Claude")
         print("3 - OpenAi")
+        print("4 - DeepSeek")
         mod_op = int(input("Opção: "))
         rawGolden = loadData(PATH_GOLDENSET)
-        rawDataset = None
-
         if mod_op == 1:
-            rawDataSet = loadData(PATH_GEMINISET)
+            rawDataset = loadData(PATH_GEMINISET)
+            bertEvaluation(rawDataset, rawGolden, PATH_GEMINIBERT)
         elif mod_op == 2:
-            rawDataSet = loadData(PATH_CLAUDESET)
+            rawDataset = loadData(PATH_CLAUDESET)
+            bertEvaluation(rawDataset, rawGolden, PATH_CLAUDEBERT)
         elif mod_op == 3:
-            rawDataSet = loadData(PATH_OPENAISET)
+            rawDataset = loadData(PATH_OPENAISET)
+            bertEvaluation(rawDataset, rawGolden, PATH_OPENAIBERT)
+        elif mod_op == 4:
+            rawDataset = loadData(PATH_DEEPSEEKSET)
+            bertEvaluation(rawDataset, rawGolden, PATH_DEEPSEEKBERT)
             
-        bertEvaluation(rawDataset, rawGolden)
+
     elif (op == 3):
         df1 = None
         df2 = None
@@ -79,6 +89,5 @@ while(True):
             continue
 
         bertCompareGraph(df1, df2)
-
-
-
+    elif (op == 4):
+        break

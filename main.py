@@ -9,53 +9,68 @@ import pandas as pd
 
 #carrega os caminhos dos datasets // alterar posteriormente
 PATH_GOLDENSET = os.path.join("data", "raw", "stackoverflow_dataset.json") 
-PATH_GEMINISET = os.path.join("data", "processed", "gemini_dataset_v2.json")
-PATH_GEMINIBERT1 = os.path.join("results", "csv", "avBert_gemini_v1.csv")
-PATH_GEMINIBERT2 = os.path.join("results", "csv", "avBert_gemini_v2.csv")
+
+PATH_GEMINISET = os.path.join("data", "processed", "gemini_dataset.json")
+PATH_GEMINIBERT = os.path.join("results", "csv", "avBert_gemini.csv")
+
 PATH_CLAUDESET = os.path.join("data", "processed", "claude_dataset.json")
 PATH_CLAUDEBERT = os.path.join("results", "csv", "avBert_claude.csv")
 PATH_DEEPSEEKSET = os.path.join("data", "processed", "deepseek_dataset.json")
 PATH_DEEPSEEKBERT = os.path.join("results", "csv", "avBert_deepseek.csv")
+
+PATH_OPENAISET = os.path.join("data", "processed", "openai_dataset.json")
+PATH_OPENAIBERT = os.path.join("results", "csv", "avBert_openai.csv")
+
+
+
+
 
 print("MENU - ARTIGO RAG")
 while(True):
     print("\n1 - Gerar novo dataset")
     print("2 - Compara dataset com Goldenset")
     print("3 - Criar gráficos de comparação")
+    print("4 - Sair")
     op = int(input("Opção: "))
 
     if (op == 1):
         print("Qual modelo deseja usar?")
         print("1 - Gemini")
         print("2 - Claude")
-        print("3 - DeepSeek")
+        print("3 - OpenAi")
+        print("4 - DeepSeek")
         mod_op = int(input("Opção: "))
         rawGolden = loadData(PATH_GOLDENSET)
-        
-        if mod_op == 2:
+        if mod_op == 1:
+            process_questions(rawGolden, PATH_GEMINISET, "gemini")
+        elif mod_op == 2:
             process_questions(rawGolden, PATH_CLAUDESET, "claude")
         elif mod_op == 3:
+            process_questions(rawGolden, PATH_OPENAISET, "openai")
+        elif mod_op == 4:
             process_questions(rawGolden, PATH_DEEPSEEKSET, "deepseek")
-        else:
-            process_questions(rawGolden, PATH_GEMINISET, "gemini")
             
     elif (op == 2):
         print("Qual dataset deseja avaliar?")
         print("1 - Gemini")
         print("2 - Claude")
-        print("3 - DeepSeek")
+        print("3 - OpenAi")
+        print("4 - DeepSeek")
         mod_op = int(input("Opção: "))
-        
         rawGolden = loadData(PATH_GOLDENSET)
-        if mod_op == 2:
+        if mod_op == 1:
+            rawDataset = loadData(PATH_GEMINISET)
+            bertEvaluation(rawDataset, rawGolden, PATH_GEMINIBERT)
+        elif mod_op == 2:
             rawDataset = loadData(PATH_CLAUDESET)
             bertEvaluation(rawDataset, rawGolden, PATH_CLAUDEBERT)
         elif mod_op == 3:
+            rawDataset = loadData(PATH_OPENAISET)
+            bertEvaluation(rawDataset, rawGolden, PATH_OPENAIBERT)
+        elif mod_op == 4:
             rawDataset = loadData(PATH_DEEPSEEKSET)
             bertEvaluation(rawDataset, rawGolden, PATH_DEEPSEEKBERT)
-        else:
-            rawDataset = loadData(PATH_GEMINISET)
-            bertEvaluation(rawDataset, rawGolden, PATH_GEMINIBERT2)
+            
 
     elif (op == 3):
         df1 = None
@@ -63,7 +78,16 @@ while(True):
         
         if os.path.exists(PATH_GEMINIBERT1):
             df1 = pd.read_csv(PATH_GEMINIBERT1)
+        else:
+            print(f"Aviso: Dataset Versão 1 não encontrado ({PATH_GEMINIBERT1})")
+            continue
+            
         if os.path.exists(PATH_GEMINIBERT2):
             df2 = pd.read_csv(PATH_GEMINIBERT2)
+        else:
+            print(f"Aviso: Dataset Versão 2 não encontrado ({PATH_GEMINIBERT2})")
+            continue
 
         bertCompareGraph(df1, df2)
+    elif (op == 4):
+        break

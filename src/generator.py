@@ -1,9 +1,11 @@
 import json, time
 from operator import attrgetter
 from . import dataFormat, utils
+
 from src.services.gemini_service import callApiGemini
 from src.services.claude_service import callApiClaude
 from src.services.deepseek_service import callApiDeepseek
+from src.services.openai_service import callApiOpenai
 from google.genai import errors
 from pydantic import ValidationError
 
@@ -42,6 +44,7 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str = "
             print(f"ID {currentID} já foi processado")
             continue
 
+
         print(f"{currentID} Processando com {model_engine}...")
 
         try:
@@ -50,8 +53,11 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str = "
                 QApair = callApiClaude(currentID, questionText)
             elif model_engine == "deepseek":
                 QApair = callApiDeepseek(currentID, questionText)
-            else:
+            elif model_engine == "gemini":
                 QApair = callApiGemini(currentID, questionText)
+            elif model_engine == "openai":
+                QApair = callApiOpenai(currentID, questionText)
+                
 
             clean_json = QApair.strip().replace("```json", "").replace("```", "")
 

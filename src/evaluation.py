@@ -50,9 +50,11 @@ def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str = None):
 
     df = pd.DataFrame(results)
     if outputPath is None:
-        outputPath = os.path.join("results", "csv", "avBert_gemini_v2.csv")  
+        outputPath = os.path.join("results", "csv", "avBert_gemini_v2.csv")
+    
     os.makedirs(os.path.dirname(outputPath), exist_ok=True)
     df.to_csv(outputPath, index=False, encoding='utf-8')
+
 
     return df
 

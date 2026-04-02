@@ -1,20 +1,23 @@
-from __future__ import annotations
+import torch
 from bert_score import BERTScorer
 import pandas as pd
 import os
 from . import dataFormat
+from typing import cast
 
-def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str = None):
+def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str | None):
 
     #Padroniza a estrutura de ambos os datasets com pydantic
     goldenset = dataFormat.QADataSet(data=rawGolden)
     candidateset = dataFormat.QADataSet(data=rawCandidate)
 
     #Carrega apenas uma vez as informações do modelo pré-treinado
-    scorer = BERTScorer(model_type='roberta-large',
-                                lang='en',
-                                rescale_with_baseline=False,
-                                device='cpu')
+    scorer = BERTScorer(
+        model_type='roberta-large',
+        lang='en',
+        rescale_with_baseline=False,
+        device=None,
+    )
 
 
     results = []
@@ -39,9 +42,9 @@ def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str = None):
             results.append({
                 "id": candidateItem.id,
                 "question": candidateItem.question,
-                "bert_precision": round(P.item(), 4),
-                "bert_recall": round(R.item(), 4),
-                "bert_F1": round(F1.item(), 4)
+                "bert_precision": round(cast(torch.Tensor, P).item(), 4),
+                "bert_recall": round(cast(torch.Tensor, R).item(), 4),
+                "bert_F1": round(cast(torch.Tensor, F1).item(), 4)
             })
         else:
             print(f"\nNão foi achado o ID correspondente para a questão {gold.id}...")
@@ -50,7 +53,7 @@ def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str = None):
 
     df = pd.DataFrame(results)
     if outputPath is None:
-        outputPath = os.path.join("results", "csv", "avBert_gemini_v2.csv")
+        outputPath = os.path.join("results", "csv", "avBert_who.csv")
     
     os.makedirs(os.path.dirname(outputPath), exist_ok=True)
     df.to_csv(outputPath, index=False, encoding='utf-8')

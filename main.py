@@ -15,6 +15,7 @@ PATH_GEMINIBERT = os.path.join("results", "csv", "avBert_gemini.csv")
 
 PATH_CLAUDESET = os.path.join("data", "processed", "claude_dataset.json")
 PATH_CLAUDEBERT = os.path.join("results", "csv", "avBert_claude.csv")
+
 PATH_DEEPSEEKSET = os.path.join("data", "processed", "deepseek_dataset.json")
 PATH_DEEPSEEKBERT = os.path.join("results", "csv", "avBert_deepseek.csv")
 
@@ -73,7 +74,7 @@ while(True):
             
 
     elif (op == 3):
-        df1 = None
+        '''df1 = None
         df2 = None
         
         if os.path.exists(PATH_GEMINIBERT1):
@@ -88,6 +89,6 @@ while(True):
             print(f"Aviso: Dataset Versão 2 não encontrado ({PATH_GEMINIBERT2})")
             continue
 
-        bertCompareGraph(df1, df2)
+        bertCompareGraph(df1, df2)'''
     elif (op == 4):
         break

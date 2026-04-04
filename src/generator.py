@@ -13,7 +13,7 @@ from pydantic import ValidationError
 TIME_BETWEEN_CALLS = 10
 
 
-def process_questions(goldenSet: list, pathCandidate: str, model_engine: str = "gemini"):
+def process_questions(goldenSet: list, pathCandidate: str, model_engine: str):
 
     #1. LÓGICA DE PERSISTÊNCIA
     #Carrega os dados existentes no caminho informado  
@@ -55,7 +55,7 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str = "
                 QApair = callApiDeepseek(currentID, questionText)
             elif model_engine == "gemini":
                 QApair = callApiGemini(currentID, questionText)
-            elif model_engine == "openai":
+            else:
                 QApair = callApiOpenai(currentID, questionText)
                 
 

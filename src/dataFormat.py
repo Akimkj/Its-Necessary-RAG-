@@ -1,12 +1,12 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, StringConstraints
 from . import utils 
-from typing import List
+from typing import List, Annotated
 
 
 class QAPairModel(BaseModel):
     id: int = Field(gt=0)
-    question: str = Field(strip_whitespace=True)
-    answer: str = Field(strip_whitespace=True)
+    question: Annotated[str, StringConstraints(strip_whitespace=True)]
+    answer: Annotated[str, StringConstraints(strip_whitespace=True)]
     
 
 

@@ -2,10 +2,8 @@ from google import genai
 from google.genai import types
 
 
-client = genai.Client() 
-
-
 def callApiGemini(currID: int, question) -> str:
+    client = genai.Client()
     result = client.models.generate_content(
                 model="gemini-2.5-flash",
                 config=types.GenerateContentConfig(

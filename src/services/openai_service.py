@@ -4,12 +4,8 @@ import os
 
 load_dotenv()
 
-openai_key = os.getenv("OPENAI_API_KEY")
-
-
-client=OpenAI(api_key=openai_key)
-
 def callApiOpenai(id: int, question):
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[

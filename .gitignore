@@ -8,6 +8,10 @@ venv/
 .env
 .env/
 
-#IDE 
+#IDE
 .vscode/
 .idea/
+
+#Node
+node_modules/
+yarn.lock

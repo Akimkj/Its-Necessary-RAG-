@@ -6,9 +6,10 @@ from src.utils import loadData, bertCompareGraph
 from src.generator import process_questions
 from src.evaluation import bertEvaluation
 from src.bertStatistics import generate_statistics
+from src.charts import run_charts
 import pandas as pd
 
-# Dataset paths
+# ── Caminhos dos datasets ──
 PATH_GOLDENSET = os.path.join("data", "raw", "stackoverflow_dataset.json")
 
 PATH_GEMINISET  = os.path.join("data", "processed", "gemini_dataset.json")
@@ -25,7 +26,7 @@ PATH_OPENAIBERT = os.path.join("results", "csv", "avBert_openai.csv")
 
 PATH_STATS_CSV = os.path.join("results", "stats", "bert_statistics.csv")
 
-# Mapping used by the statistics option
+# Mapeamento modelo → caminho do CSV BERT (usado pela opção 4)
 MODELS_BERT = {
     "Gemini":   PATH_GEMINIBERT,
     "Claude":   PATH_CLAUDEBERT,
@@ -37,17 +38,18 @@ MODELS_BERT = {
 print("MENU - RAG PAPER")
 while True:
     print("\n1 - Gerar novo dataset")
-    print("2 - Compare dataset com Goldenset")
-    print("3 - Criar grafico comparativo")
+    print("2 - Comparar dataset com Goldenset (BERT)")
+    print("3 - Gerar graficos comparativos")
     print("4 - Calcular estatisticas BERT")
     print("5 - Sair")
     op = int(input("Option: "))
 
+    # ── Opção 1: gera respostas do modelo escolhido ──
     if op == 1:
-        print("Qual modelo deseja usar ?")
+        print("Qual modelo deseja usar?")
         print("1 - Gemini")
         print("2 - Claude")
-        print("3 - OpenAi")
+        print("3 - OpenAI")
         print("4 - DeepSeek")
         mod_op = int(input("Option: "))
         rawGolden = loadData(PATH_GOLDENSET)
@@ -60,11 +62,12 @@ while True:
         elif mod_op == 4:
             process_questions(rawGolden, PATH_DEEPSEEKSET, "deepseek")
 
+    # ── Opção 2: avalia um dataset com BERT Score ──
     elif op == 2:
-        print("Qual dataset deseja avaliar")
+        print("Qual dataset deseja avaliar?")
         print("1 - Gemini")
         print("2 - Claude")
-        print("3 - OpenAi")
+        print("3 - OpenAI")
         print("4 - DeepSeek")
         mod_op = int(input("Option: "))
         rawGolden = loadData(PATH_GOLDENSET)
@@ -81,24 +84,11 @@ while True:
             rawDataset = loadData(PATH_DEEPSEEKSET)
             bertEvaluation(rawDataset, rawGolden, PATH_DEEPSEEKBERT)
 
+    # ── Opção 3: gera gráficos a partir das estatísticas BERT ──
     elif op == 3:
-        '''df1 = None
-        df2 = None
-        
-        if os.path.exists(PATH_GEMINIBERT1):
-            df1 = pd.read_csv(PATH_GEMINIBERT1)
-        else:
-            print(f"Warning: Version 1 dataset not found ({PATH_GEMINIBERT1})")
-            continue
-            
-        if os.path.exists(PATH_GEMINIBERT2):
-            df2 = pd.read_csv(PATH_GEMINIBERT2)
-        else:
-            print(f"Warning: Version 2 dataset not found ({PATH_GEMINIBERT2})")
-            continue
+        run_charts(PATH_STATS_CSV)
 
-        bertCompareGraph(df1, df2)'''
-
+    # ── Opção 4: calcula e salva as estatísticas BERT ──
     elif op == 4:
         generate_statistics(MODELS_BERT, PATH_STATS_CSV)
 

@@ -2,10 +2,10 @@ import torch
 from bert_score import BERTScorer
 import pandas as pd
 import os
-from . import dataFormat
+from src import dataFormat
 from typing import cast
 
-def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str | None):
+def robertaLargeEvaluation(rawCandidate: list, rawGolden: list, outputPath: str | None):
 
     #Padroniza a estrutura de ambos os datasets com pydantic
     goldenset = dataFormat.QADataSet(data=rawGolden)
@@ -36,7 +36,7 @@ def bertEvaluation(rawCandidate: list, rawGolden: list, outputPath: str | None):
             candidate = candidateItem.answer
             
             #realiza o calculo com a referencia e o candidato
-            P, R, F1 = scorer.score([reference], [candidate])
+            P, R, F1 = scorer.score([candidate],[reference])
 
             #adiciona as informações do id e pergunta junto com seus resultados
             results.append({

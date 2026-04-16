@@ -4,7 +4,8 @@ load_dotenv()
 
 from src.utils import loadData, bertCompareGraph
 from src.generator import process_questions
-from src.evaluation import bertEvaluation
+from src.evaluators.modernBert_eva import modernBertEvaluation
+from src.evaluators.robertaLarge_eva import robertaLargeEvaluation
 from src.bertStatistics import generate_statistics
 from src.charts import run_charts
 import pandas as pd
@@ -64,25 +65,50 @@ while True:
 
     # ── Opção 2: avalia um dataset com BERT Score ──
     elif op == 2:
-        print("Qual dataset deseja avaliar?")
-        print("1 - Gemini")
-        print("2 - Claude")
-        print("3 - OpenAI")
-        print("4 - DeepSeek")
+        print("Qual modelo deseja usar?")
+        print("1 - ModernBERT")
+        print("2 - RobertaLarge")
         mod_op = int(input("Option: "))
-        rawGolden = loadData(PATH_GOLDENSET)
         if mod_op == 1:
-            rawDataset = loadData(PATH_GEMINISET)
-            bertEvaluation(rawDataset, rawGolden, PATH_GEMINIBERT)
+            print("Qual dataset deseja avaliar?")
+            print("1 - Gemini")
+            print("2 - Claude")
+            print("3 - OpenAI")
+            print("4 - DeepSeek")
+            mod_op = int(input("Option: "))
+            rawGolden = loadData(PATH_GOLDENSET)
+            if mod_op == 1:
+                rawDataset = loadData(PATH_GEMINISET)
+                modernBertEvaluation(rawDataset, rawGolden, PATH_GEMINIBERT)
+            elif mod_op == 2:
+                rawDataset = loadData(PATH_CLAUDESET)
+                modernBertEvaluation(rawDataset, rawGolden, PATH_CLAUDEBERT)
+            elif mod_op == 3:
+                rawDataset = loadData(PATH_OPENAISET)
+                modernBertEvaluation(rawDataset, rawGolden, PATH_OPENAIBERT)
+            elif mod_op == 4:
+                rawDataset = loadData(PATH_DEEPSEEKSET)
+                modernBertEvaluation(rawDataset, rawGolden, PATH_DEEPSEEKBERT)
         elif mod_op == 2:
-            rawDataset = loadData(PATH_CLAUDESET)
-            bertEvaluation(rawDataset, rawGolden, PATH_CLAUDEBERT)
-        elif mod_op == 3:
-            rawDataset = loadData(PATH_OPENAISET)
-            bertEvaluation(rawDataset, rawGolden, PATH_OPENAIBERT)
-        elif mod_op == 4:
-            rawDataset = loadData(PATH_DEEPSEEKSET)
-            bertEvaluation(rawDataset, rawGolden, PATH_DEEPSEEKBERT)
+            print("Qual dataset deseja avaliar?")
+            print("1 - Gemini")
+            print("2 - Claude")
+            print("3 - OpenAI")
+            print("4 - DeepSeek")
+            mod_op = int(input("Option: "))
+            rawGolden = loadData(PATH_GOLDENSET)
+            if mod_op == 1:
+                rawDataset = loadData(PATH_GEMINISET)
+                robertaLargeEvaluation(rawDataset, rawGolden, PATH_GEMINIBERT)
+            elif mod_op == 2:
+                rawDataset = loadData(PATH_CLAUDESET)
+                robertaLargeEvaluation(rawDataset, rawGolden, PATH_CLAUDEBERT)
+            elif mod_op == 3:
+                rawDataset = loadData(PATH_OPENAISET)
+                robertaLargeEvaluation(rawDataset, rawGolden, PATH_OPENAIBERT)
+            elif mod_op == 4:
+                rawDataset = loadData(PATH_DEEPSEEKSET)
+                robertaLargeEvaluation(rawDataset, rawGolden, PATH_DEEPSEEKBERT)
 
     # ── Opção 3: gera gráficos a partir das estatísticas BERT ──
     elif op == 3:

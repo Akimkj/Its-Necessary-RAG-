@@ -27,6 +27,16 @@ STAT_NAMES = {
     "desvio":  "Desvio",
 }
 
+# Coluna no CSV individual de cada modelo para o question heatmap
+HEATMAP_METRIC_COL = {
+    "precision": "bert_precision",
+    "recall":    "bert_recall",
+    "F1":        "bert_F1",
+}
+
+# Pasta padrão dos CSVs por questão
+CSV_DIR = os.path.join("results", "csv")
+
 
 def _get_color(model, index):
     """Retorna a cor do modelo ou uma cor padrão pelo índice."""
@@ -241,16 +251,80 @@ def plot_line(df, metrics, stats):
     _save(fig, "line_chart.png")
 
 
+# GRÁFICO 6 — Question Heatmap (modelo × questão)
+def plot_question_heatmap(csv_dir, metric):
+    """
+    Lê os CSVs individuais de cada LLM em csv_dir e gera um heatmap
+    onde linhas = modelos e colunas = questões, colorido pela métrica escolhida.
+    """
+    col          = HEATMAP_METRIC_COL.get(metric, "bert_F1")
+    metric_label = METRIC_NAMES.get(metric, metric)
+
+    model_data = {}
+    for fname in sorted(os.listdir(csv_dir)):
+        if fname.startswith("avBert_") and fname.endswith(".csv"):
+            raw_name   = fname.replace("avBert_", "").replace(".csv", "")
+            model_name = raw_name.capitalize()
+            fpath      = os.path.join(csv_dir, fname)
+            df_m       = pd.read_csv(fpath)
+            if col in df_m.columns:
+                model_data[model_name] = df_m[col].values
+
+    if not model_data:
+        print(f"  [Aviso] Nenhum CSV avBert_*.csv encontrado em {csv_dir}. Pulando...")
+        return
+
+    models     = list(model_data.keys())
+    n_q        = len(next(iter(model_data.values())))
+    matrix     = np.array([model_data[m] for m in models])
+
+    fig_w = max(16, n_q * 0.20)
+    fig_h = max(3,  len(models) * 1.6)
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+
+    im = ax.imshow(matrix, cmap="Greens", aspect="auto", vmin=0.0, vmax=1.0)
+    cbar = plt.colorbar(im, ax=ax, fraction=0.02, pad=0.02)
+    cbar.set_label(metric_label, fontsize=11)
+
+    # Eixo Y — modelos
+    ax.set_yticks(range(len(models)))
+    ax.set_yticklabels(models, fontsize=11)
+    ax.set_ylabel("Model", fontsize=12)
+
+    # Eixo X — questões (tick a cada ~5 questões para não poluir)
+    step = max(1, n_q // 15)
+    xtick_pos = list(range(0, n_q, step))
+    ax.set_xticks(xtick_pos)
+    ax.set_xticklabels(xtick_pos, fontsize=8)
+    ax.set_xlabel("Question", fontsize=12)
+
+    # Grade fina entre células
+    ax.set_xticks(np.arange(-0.5, n_q, 1),        minor=True)
+    ax.set_yticks(np.arange(-0.5, len(models), 1), minor=True)
+    ax.grid(which="minor", color="white", linewidth=0.5)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    # Separadores horizontais entre modelos
+    for y in np.arange(0.5, len(models) - 0.5):
+        ax.axhline(y, color="white", linewidth=1.5)
+
+    ax.set_title(f"{metric_label} Heatmap by Question and Model",
+                 fontsize=13, fontweight="bold")
+    fig.tight_layout()
+    _save(fig, f"question_heatmap_{metric}.png")
+
+
 # ──────────────────────────────────────────────────────────
 # DISPATCHER — chamado pelo menu da main
 # ──────────────────────────────────────────────────────────
 
 CHART_OPTIONS = {
-    1: ("Bar Chart",   plot_bar),
-    2: ("Box Plot",    plot_box),
-    3: ("Radar Chart", plot_radar),
-    4: ("Heatmap",     plot_heatmap),
-    5: ("Line Chart",  plot_line),
+    1: ("Bar Chart",        plot_bar),
+    2: ("Box Plot",         plot_box),
+    3: ("Radar Chart",      plot_radar),
+    4: ("Heatmap",          plot_heatmap),
+    5: ("Line Chart",       plot_line),
+    6: ("Question Heatmap", plot_question_heatmap),
 }
 
 METRIC_OPTIONS = {
@@ -272,13 +346,48 @@ STAT_OPTIONS = {
     7: ["mediana", "desvio"],
 }
 
+# Opções de métrica exclusivas para o Question Heatmap
+HEATMAP_METRIC_OPTIONS = {
+    1: "precision",
+    2: "recall",
+    3: "F1",
+}
 
-def run_charts(stats_csv_path):
+
+def run_charts(stats_csv_path, csv_dir=None):
     """
     Exibe o submenu de gráficos e gera o gráfico escolhido.
-    Recebe o caminho do CSV de estatísticas gerado por generate_statistics().
+
+    Parâmetros
+    ----------
+    stats_csv_path : str
+        Caminho do CSV de estatísticas gerado por generate_statistics().
+    csv_dir : str, optional
+        Pasta com os CSVs individuais de cada LLM (avBert_*.csv).
+        Se None, usa CSV_DIR (results/csv).
     """
-    # Verifica se o CSV de estatísticas existe antes de continuar
+    if csv_dir is None:
+        csv_dir = CSV_DIR
+
+    # ── Seleção de gráfico ──
+    print("\n--- Tipo de Gráfico ---")
+    for key, (name, _) in CHART_OPTIONS.items():
+        print(f"{key} - {name}")
+    print("7 - Todos os gráficos")
+    c_op = int(input("Escolha o gráfico: "))
+
+    # ── Question Heatmap: fluxo próprio (métrica apenas, sem estatísticas) ──
+    if c_op == 6:
+        print("\n--- Métrica para o Question Heatmap ---")
+        for k, m in HEATMAP_METRIC_OPTIONS.items():
+            print(f"{k} - {METRIC_NAMES[m]}")
+        hm_op  = int(input("Escolha a métrica: "))
+        metric = HEATMAP_METRIC_OPTIONS.get(hm_op, "F1")
+        print(f"\nGerando Question Heatmap ({METRIC_NAMES[metric]})...")
+        plot_question_heatmap(csv_dir, metric)
+        return
+
+    # ── Para os demais gráficos: precisa do CSV de estatísticas ──
     if not os.path.exists(stats_csv_path):
         print(f"\n[Erro] Arquivo de estatísticas não encontrado: {stats_csv_path}")
         print("Execute a opção 4 primeiro para gerar as estatísticas.\n")
@@ -309,18 +418,16 @@ def run_charts(stats_csv_path):
     s_op  = int(input("Escolha as estatísticas: "))
     stats = STAT_OPTIONS.get(s_op, STAT_OPTIONS[1])
 
-    # ── Seleção de gráfico ──
-    print("\n--- Tipo de Gráfico ---")
-    for key, (name, _) in CHART_OPTIONS.items():
-        print(f"{key} - {name}")
-    print("6 - Todos os gráficos")
-    c_op = int(input("Escolha o gráfico: "))
-
     print()
-    if c_op == 6:
-        for _, (name, func) in CHART_OPTIONS.items():
+    if c_op == 7:
+        # Gera todos os gráficos de estatísticas
+        stats_charts = {k: v for k, v in CHART_OPTIONS.items() if k != 6}
+        for _, (name, func) in stats_charts.items():
             print(f"Gerando {name}...")
             func(df, metrics, stats)
+        # Question Heatmap com F1 por padrão ao gerar tudo
+        print("Gerando Question Heatmap (F1)...")
+        plot_question_heatmap(csv_dir, "F1")
     elif c_op in CHART_OPTIONS:
         name, func = CHART_OPTIONS[c_op]
         print(f"Gerando {name}...")

@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import json
 from langchain_core.documents import Document
 
-MONGO_URI = mongodb+srv://didizst:Tabita1989.@cluster-rag.hworbxl.mongodb.net/?appName=Cluster-RAG
+MONGO_URI = "mongodb+srv://didizst:Tabita1989.@cluster-rag.hworbxl.mongodb.net/?appName=Cluster-RAG"
 DB_NAME = "RAG"
 COLLECTION_NAME = "RAG"
 
@@ -23,10 +23,12 @@ def insert_embeddings_to_mongodb(json_data: str | list):
         try:
             collection.insert_one(item)
             inserted += 1
-            print(f"✅ Inserido: {item['id']}")
+            doc_id = item.get('_id', item.get('id', 'unknown'))
+            print(f"✅ Inserido: {doc_id}")
         except Exception as e:
             errors += 1
-            print(f"❌ Erro ao inserir {item.get('id', 'unknown')}: {e}")
+            doc_id = item.get('_id', item.get('id', 'unknown'))
+            print(f"❌ Erro ao inserir {doc_id}: {e}")
 
     client.close()
     print(f"\n📊 Resultado: {inserted} inseridos, {errors} erros")

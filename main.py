@@ -1,4 +1,4 @@
-import os
+﻿import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -8,6 +8,7 @@ from src.evaluators.modernBert_eva import modernBertEvaluation
 from src.evaluators.robertaLarge_eva import robertaLargeEvaluation
 from src.bertStatistics import generate_statistics
 from src.charts import run_charts
+from src.ingestionPipeline import run_ingestion_pipeline
 import pandas as pd
 
 # ── Caminhos dos datasets ──
@@ -42,7 +43,8 @@ while True:
     print("2 - Comparar dataset com Goldenset (BERT)")
     print("3 - Gerar graficos comparativos")
     print("4 - Calcular estatisticas BERT")
-    print("5 - Sair")
+    print("5 - Carregar documento no banco de dados (chunking + embedding + MongoDB)")
+    print("6 - Sair")
     op = int(input("Option: "))
 
     # ── Opção 1: gera respostas do modelo escolhido ──
@@ -118,5 +120,9 @@ while True:
     elif op == 4:
         generate_statistics(MODELS_BERT, PATH_STATS_CSV)
 
+    # ── Opção 5: pipeline de ingestião de documentos no MongoDB ──
     elif op == 5:
+        run_ingestion_pipeline()
+
+    elif op == 6:
         break

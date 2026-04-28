@@ -274,15 +274,18 @@ def plot_question_heatmap(csv_dir, metric):
         print(f"  [Aviso] Nenhum CSV avBert_*.csv encontrado em {csv_dir}. Pulando...")
         return
 
-    models     = list(model_data.keys())
-    n_q        = len(next(iter(model_data.values())))
+    models = list(model_data.keys())
+    n_q    = len(next(iter(model_data.values())))
+
+
     matrix     = np.array([model_data[m] for m in models])
+
 
     fig_w = max(16, n_q * 0.20)
     fig_h = max(3,  len(models) * 1.6)
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
 
-    im = ax.imshow(matrix, cmap="Greens", aspect="auto", vmin=0.0, vmax=1.0)
+    im = ax.imshow(matrix, cmap="RdYlGn", aspect="auto", vmin=0.0, vmax=1.0)
     cbar = plt.colorbar(im, ax=ax, fraction=0.02, pad=0.02)
     cbar.set_label(metric_label, fontsize=11)
 

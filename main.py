@@ -2,14 +2,13 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from src.utils import loadData, bertCompareGraph
+from src.utils import loadData
 from src.generator import process_questions
 from src.evaluators.modernBert_eva import modernBertEvaluation
 from src.evaluators.robertaLarge_eva import robertaLargeEvaluation
 from src.bertStatistics import generate_statistics
 from src.charts import run_charts
 from src.ingestionPipeline import run_ingestion_pipeline
-import pandas as pd
 
 # ── Caminhos dos datasets ──
 PATH_GOLDENSET = os.path.join("data", "raw", "stackoverflow_dataset.json")
@@ -27,6 +26,9 @@ PATH_OPENAISET  = os.path.join("data", "processed", "openai_dataset.json")
 PATH_OPENAIBERT = os.path.join("results", "csv", "avBert_openai.csv")
 
 PATH_STATS_CSV = os.path.join("results", "stats", "bert_statistics.csv")
+
+
+
 
 # Mapeamento modelo → caminho do CSV BERT (usado pela opção 4)
 MODELS_BERT = {

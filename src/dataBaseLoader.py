@@ -1,10 +1,14 @@
 from pymongo import MongoClient
 import json
+import os
+from dotenv import load_dotenv
 from langchain_core.documents import Document
 
-MONGO_URI = "mongodb+srv://didizst:Tabita1989.@cluster-rag.hworbxl.mongodb.net/?appName=Cluster-RAG"
-DB_NAME = "RAG"
-COLLECTION_NAME = "RAG"
+load_dotenv()
+
+MONGO_URI = os.getenv("MONGO_URI")
+DB_NAME = os.getenv("DB_NAME")
+COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 
 def insert_embeddings_to_mongodb(json_data: str | list):
     if isinstance(json_data, str):
@@ -24,11 +28,11 @@ def insert_embeddings_to_mongodb(json_data: str | list):
             collection.insert_one(item)
             inserted += 1
             doc_id = item.get('_id', item.get('id', 'unknown'))
-            print(f"✅ Inserido: {doc_id}")
+            print(f"Inserido: {doc_id}")
         except Exception as e:
             errors += 1
             doc_id = item.get('_id', item.get('id', 'unknown'))
-            print(f"❌ Erro ao inserir {doc_id}: {e}")
+            print(f"Erro ao inserir {doc_id}: {e}")
 
     client.close()
-    print(f"\n📊 Resultado: {inserted} inseridos, {errors} erros")
+    print(f"\nResultado: {inserted} inseridos, {errors} erros")

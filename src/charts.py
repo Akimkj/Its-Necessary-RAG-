@@ -314,7 +314,7 @@ def plot_question_heatmap(csv_dir, metric):
     ax.set_title(f"{metric_label} Heatmap by Question and Model",
                  fontsize=13, fontweight="bold")
     fig.tight_layout()
-    _save(fig, f"question_heatmap_{metric}.png")
+    _save(fig, f"question_heatmap_{metric + "v2"}.png")
 
 
 # ──────────────────────────────────────────────────────────

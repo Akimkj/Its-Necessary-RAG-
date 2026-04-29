@@ -70,6 +70,8 @@ rawData['data'].sort(key=lambda x: len(x["answer"]))
 with open(PATH_GOLDENSET, 'w', encoding='utf-8') as file:
     json.dump(rawData,file, indent=4, ensure_ascii=False)'''
 
+
+"""
 MODEL_ID = "answerdotai/ModernBERT-large"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -93,3 +95,4 @@ P, R, F1 = _bertscore_prf("In Python, use if not my_list:. In JavaScript, check 
 print(f"F1 teste: {F1}")
 
 '''round(cast(torch.Tensor, F1).item(), 4)'''
+"""

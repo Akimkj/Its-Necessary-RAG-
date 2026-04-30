@@ -14,15 +14,19 @@ from src.ingestionPipeline import run_ingestion_pipeline
 PATH_GOLDENSET = os.path.join("data", "raw", "popular_StackOverflow.json")
 
 PATH_GEMINISET  = os.path.join("data", "processed", "gemini_dataset.json")
+PATH_GEMINISET_LIMITED = os.path.join("data", "processed", "limited", "gemini_dataset_limited.json")
 PATH_GEMINIBERT = os.path.join("results", "csv", "avBert_gemini.csv")
 
 PATH_CLAUDESET  = os.path.join("data", "processed", "claude_dataset.json")
+PATH_CLAUDESET_LIMITED = os.path.join("data", "processed", "limited", "claude_dataset_limited.json")
 PATH_CLAUDEBERT = os.path.join("results", "csv", "avBert_claude.csv")
 
 PATH_DEEPSEEKSET  = os.path.join("data", "processed", "deepseek_dataset.json")
+PATH_DEEPSEEKSET_LIMITED = os.path.join("data", "processed", "limited", "deepseek_dataset_limited.json")
 PATH_DEEPSEEKBERT = os.path.join("results", "csv", "avBert_deepseek.csv")
 
 PATH_OPENAISET  = os.path.join("data", "processed", "openai_dataset.json")
+PATH_OPENAISET_LIMITED =  os.path.join("data", "processed", "limited", "openai_dataset_limited.json")
 PATH_OPENAIBERT = os.path.join("results", "csv", "avBert_openai.csv")
 
 PATH_STATS_CSV = os.path.join("results", "stats", "bert_statistics.csv")
@@ -59,13 +63,13 @@ while True:
         mod_op = int(input("Option: "))
         rawGolden = loadData(PATH_GOLDENSET)
         if mod_op == 1:
-            process_questions(rawGolden, PATH_GEMINISET, "gemini")
+            process_questions(rawGolden, PATH_GEMINISET_LIMITED, "gemini")
         elif mod_op == 2:
-            process_questions(rawGolden, PATH_CLAUDESET, "claude")
+            process_questions(rawGolden, PATH_CLAUDESET_LIMITED, "claude")
         elif mod_op == 3:
-            process_questions(rawGolden, PATH_OPENAISET, "openai")
+            process_questions(rawGolden, PATH_OPENAISET_LIMITED, "openai")
         elif mod_op == 4:
-            process_questions(rawGolden, PATH_DEEPSEEKSET, "deepseek")
+            process_questions(rawGolden, PATH_DEEPSEEKSET_LIMITED, "deepseek")
 
     # ── Opção 2: avalia um dataset com BERT Score ──
     elif op == 2:

@@ -38,7 +38,7 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str):
 
         currentID = rawItem.get('id') #id do item atual
         questionText = rawItem.get('question') #questao do item atual
-        tokens_answer_stackOverflow = count_tokens(rawItem.get('answer'), model_engine)
+        tokens_answer_stackOverflow = count_tokens(rawItem.get('answer'), model_engine) # quantidade de tokens da resposta do item atual
 
         #Pula se o ID já foi processado anteriormente
         if (currentID in processedIDs):
@@ -53,11 +53,11 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str):
             
 
             if model_engine == "claude":
-                QApair = callApiClaude(currentID, questionText)
+                QApair = callApiClaude(currentID, questionText, tokens_answer_stackOverflow)
             elif model_engine == "deepseek":
-                QApair = callApiDeepseek(currentID, questionText)
+                QApair = callApiDeepseek(currentID, questionText, tokens_answer_stackOverflow)
             elif model_engine == "gemini":
-                QApair = callApiGemini(currentID, questionText)
+                QApair = callApiGemini(currentID, questionText, tokens_answer_stackOverflow)
             else:
                 QApair = callApiOpenai(currentID, questionText, tokens_answer_stackOverflow)
                 

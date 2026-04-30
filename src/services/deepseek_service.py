@@ -17,6 +17,6 @@ def callApiDeepseek(CurrID: int, question: str) -> str:
                 "content": f"ID: {CurrID}\n Question provided: {question}"
             },
         ],
-        max_tokens=4096,
+        max_tokens=8192,
     )       
     return response.choices[0].message.content or ""

@@ -7,7 +7,7 @@ def callApiGemini(currID: int, question) -> str:
     result = client.models.generate_content(
                 model="gemini-2.5-flash",
                 config=types.GenerateContentConfig(
-                    max_output_tokens=4096,
+                    max_output_tokens=8192,
                     system_instruction=[
                         "You are an expert in Computer Science and Python documentation.", 
                         "Your task is to answer the provided question in a complete, technical, and detailed manner.",

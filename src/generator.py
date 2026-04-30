@@ -1,7 +1,7 @@
 import json, time
 from operator import attrgetter
 from . import dataFormat, utils
-
+from src.count_tokens import count_tokens
 from src.services.gemini_service import callApiGemini
 from src.services.claude_service import callApiClaude
 from src.services.deepseek_service import callApiDeepseek
@@ -37,7 +37,8 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str):
     for i, rawItem in enumerate(goldenSet):
 
         currentID = rawItem.get('id') #id do item atual
-        questionText = rawItem.get('question') #questao do item atual 
+        questionText = rawItem.get('question') #questao do item atual
+        tokens_answer_stackOverflow = count_tokens(rawItem.get('answer'), model_engine)
 
         #Pula se o ID já foi processado anteriormente
         if (currentID in processedIDs):
@@ -49,6 +50,8 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str):
 
         try:
             # 3. Chamada da Api
+            
+
             if model_engine == "claude":
                 QApair = callApiClaude(currentID, questionText)
             elif model_engine == "deepseek":
@@ -56,7 +59,7 @@ def process_questions(goldenSet: list, pathCandidate: str, model_engine: str):
             elif model_engine == "gemini":
                 QApair = callApiGemini(currentID, questionText)
             else:
-                QApair = callApiOpenai(currentID, questionText)
+                QApair = callApiOpenai(currentID, questionText, tokens_answer_stackOverflow)
                 
 
             clean_json = QApair.strip().replace("```json", "").replace("```", "")

@@ -2,10 +2,11 @@ import os
 from src.evaluators.modernBert_eva import modernBertEvaluation
 from src.charts import run_charts
 from src.utils import loadData
+from src.services.openai_service import callApiOpenai
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModel
 import torch
-import os
+from src.count_tokens import count_tokens
 from bert_score import BERTScorer
 from typing import cast
 
@@ -96,3 +97,10 @@ print(f"F1 teste: {F1}")
 
 '''round(cast(torch.Tensor, F1).item(), 4)'''
 """
+tokens_answer_stackOverflow = count_tokens("If the reason you're checking is so you can do something like if file_exists: open_it(), it's safer to use a try around the attempt to open it. Checking and then opening risks the file being deleted or moved or something between when you check and when you try to open it. If you're not planning to open the file immediately, you can use os.path.isfile if you need to be sure it's a file. Return True if path is an existing regular file. This follows symbolic links, so both islink() and isfile() can be true for the same path. import os.path os.path.isfile(fname) pathlib Starting with Python 3.4, the pathlib module offers an object-oriented approach (backported to pathlib2 in Python 2.7): from pathlib import Path my_file = Path(\"/path/to/file\") if my_file.is_file(): # file exists To check a directory, do: if my_file.is_dir(): # directory exists To check whether a Path object exists independently of whether is it a file or directory, use exists(): if my_file.exists(): # path exists You can also use resolve(strict=True) in a try block: try: my_abs_path = my_file.resolve(strict=True) except FileNotFoundError: # doesn't exist else: # exists", "openai")
+QApair = callApiOpenai(1, "How do I check whether a file exists without exceptions?", tokens_answer_stackOverflow)
+
+clean_json = QApair.strip().replace("```json", "").replace("```", "")
+
+QApair_dict['id'] = currentID
+

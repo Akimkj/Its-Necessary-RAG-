@@ -11,7 +11,7 @@ from src.charts import run_charts
 from src.ingestionPipeline import run_ingestion_pipeline
 
 # ── Caminhos dos datasets ──
-PATH_GOLDENSET = os.path.join("data", "raw", "stackoverflow_dataset.json")
+PATH_GOLDENSET = os.path.join("data", "raw", "popular_StackOverflow.json")
 
 PATH_GEMINISET  = os.path.join("data", "processed", "gemini_dataset.json")
 PATH_GEMINIBERT = os.path.join("results", "csv", "avBert_gemini.csv")

@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sympy import rotations
 
 # Pasta onde as imagens geradas serão salvas
 OUTPUT_DIR = os.path.join("results", "graphs")
@@ -261,6 +262,7 @@ def plot_question_heatmap(csv_dir, metric):
     metric_label = METRIC_NAMES.get(metric, metric)
 
     model_data = {}
+    questions_ids = None
     for fname in sorted(os.listdir(csv_dir)):
         if fname.startswith("avBert_") and fname.endswith(".csv"):
             raw_name   = fname.replace("avBert_", "").replace(".csv", "")
@@ -269,6 +271,12 @@ def plot_question_heatmap(csv_dir, metric):
             df_m       = pd.read_csv(fpath)
             if col in df_m.columns:
                 model_data[model_name] = df_m[col].values
+
+                if questions_ids is None:
+                    id_col = next(
+                        (c for c in df_m.columns if c.lower() in ("id")), None
+                    )
+                    question_ids = df_m[id_col].tolist() if id_col else list(range(len(df_m)))
 
     if not model_data:
         print(f"  [Aviso] Nenhum CSV avBert_*.csv encontrado em {csv_dir}. Pulando...")
@@ -295,10 +303,11 @@ def plot_question_heatmap(csv_dir, metric):
     ax.set_ylabel("Model", fontsize=12)
 
     # Eixo X — questões (tick a cada ~5 questões para não poluir)
-    step = max(1, n_q // 15)
-    xtick_pos = list(range(0, n_q, step))
+    xtick_pos = list(range(n_q))
+    xtick_lbl = [str(question_ids[i]) for i in xtick_pos]
+
     ax.set_xticks(xtick_pos)
-    ax.set_xticklabels(xtick_pos, fontsize=8)
+    ax.set_xticklabels(xtick_lbl, fontsize=8, rotation=90)
     ax.set_xlabel("Question", fontsize=12)
 
     # Grade fina entre células
@@ -314,7 +323,7 @@ def plot_question_heatmap(csv_dir, metric):
     ax.set_title(f"{metric_label} Heatmap by Question and Model",
                  fontsize=13, fontweight="bold")
     fig.tight_layout()
-    _save(fig, f"question_heatmap_{metric + "v2"}.png")
+    _save(fig, f"question_heatmap_{metric + "v1"}.png")
 
 
 # ──────────────────────────────────────────────────────────

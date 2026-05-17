@@ -2,10 +2,12 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 from sympy import rotations
 
 # Pasta onde as imagens geradas serão salvas
-OUTPUT_DIR = os.path.join("results", "graphs")
+OUTPUT_DIR = os.path.join("results", "graphs", "limited")
 
 # Cores fixas por modelo para manter consistência entre gráficos
 MODEL_COLORS = {
@@ -82,6 +84,7 @@ def plot_bar(df, metrics, stats):
         ax.set_xticks(x)
         ax.set_xticklabels([METRIC_NAMES[m] for m in metrics], fontsize=12)
         ax.set_ylabel(f"Score ({STAT_NAMES[stat]})")
+        ax.set_ylim(0, 0.86)
         ax.set_title(f"Bar Chart — {STAT_NAMES[stat]}")
         ax.legend(title="Model")
         ax.grid(axis="y", linestyle="--", alpha=0.5)

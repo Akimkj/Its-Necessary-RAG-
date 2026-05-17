@@ -37,6 +37,13 @@ HEATMAP_METRIC_COL = {
     "F1":        "bert_F1",
 }
 
+MODEL_DISPLAY_NAMES = {
+    "openai": "GPT-4.1 Mini",
+    "gemini": "Gemini 2.5 Flash",
+    "claude": "Claude Sonnet 4.6",
+    "deepseek": "DeepSeek-V3",
+}
+
 # Pasta padrão dos CSVs por questão
 CSV_DIR = os.path.join("results", "csv")
 
@@ -268,8 +275,10 @@ def plot_question_heatmap(csv_dir, metric):
     questions_ids = None
     for fname in sorted(os.listdir(csv_dir)):
         if fname.startswith("avBert_") and fname.endswith(".csv"):
-            raw_name   = fname.replace("avBert_", "").replace(".csv", "")
-            model_name = raw_name.capitalize()
+            raw_name = (
+                fname.replace("avBert_", "").replace(".csv", "").replace("_debug", "").replace("_limited", "")
+            )
+            model_name = MODEL_DISPLAY_NAMES.get(raw_name, raw_name)
             fpath      = os.path.join(csv_dir, fname)
             df_m       = pd.read_csv(fpath)
             if col in df_m.columns:
@@ -292,26 +301,50 @@ def plot_question_heatmap(csv_dir, metric):
     matrix     = np.array([model_data[m] for m in models])
 
 
-    fig_w = max(16, n_q * 0.20)
-    fig_h = max(3,  len(models) * 1.6)
+    
+    fig_w = max(18, n_q * 0.25)
+    fig_h = max(4.5, len(models) * 2)
+
+    plt.rcParams["font.weight"] = "bold"
+    plt.rcParams["axes.labelweight"] = "bold"
+    plt.rcParams["axes.titleweight"] = "bold"
+    plt.rcParams["font.family"] = "Arial"
+
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
 
     im = ax.imshow(matrix, cmap="RdYlGn", aspect="auto", vmin=0.0, vmax=1.0)
     cbar = plt.colorbar(im, ax=ax, fraction=0.02, pad=0.02)
-    cbar.set_label(metric_label, fontsize=11)
+    cbar.set_label(metric_label, fontsize=14)
+    cbar.ax.tick_params(labelsize=12)
+
+    for label in cbar.ax.get_yticklabels():
+        label.set_fontweight('bold')
 
     # Eixo Y — modelos
     ax.set_yticks(range(len(models)))
-    ax.set_yticklabels(models, fontsize=11)
-    ax.set_ylabel("Model", fontsize=12)
+    ax.set_yticklabels(models, fontsize=14)
+    ax.set_ylabel("Model", fontsize=14)
 
-    # Eixo X — questões (tick a cada ~5 questões para não poluir)
-    xtick_pos = list(range(n_q))
+    # Mostrar ticks a cada 5 questões
+    step = max(1, n_q // 15)
+
+    xtick_pos = list(range(0, n_q, step))
     xtick_lbl = [str(question_ids[i]) for i in xtick_pos]
 
     ax.set_xticks(xtick_pos)
-    ax.set_xticklabels(xtick_lbl, fontsize=8, rotation=90)
-    ax.set_xlabel("Question", fontsize=12)
+    ax.set_xticklabels(
+        xtick_lbl,
+        fontsize=10,
+        rotation=0
+    )
+
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
+
+    ax.set_xlabel("Question", fontsize=14)
 
     # Grade fina entre células
     ax.set_xticks(np.arange(-0.5, n_q, 1),        minor=True)
@@ -323,10 +356,9 @@ def plot_question_heatmap(csv_dir, metric):
     for y in np.arange(0.5, len(models) - 0.5):
         ax.axhline(y, color="white", linewidth=1.5)
 
-    ax.set_title(f"{metric_label} Heatmap by Question and Model",
-                 fontsize=13, fontweight="bold")
+    
     fig.tight_layout()
-    _save(fig, f"question_heatmap_{metric + "v1"}.png")
+    _save(fig, f"question_heatmap_{metric}v3.pdf")
 
 
 # ──────────────────────────────────────────────────────────

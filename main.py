@@ -42,7 +42,9 @@ PATH_STATS_BASE_CSV = os.path.join("results", "stats", "base", "bert_base_statis
 PATH_STATS_LIMITED_CSV = os.path.join("results", "stats", "limited", "bert_limited_statistics.csv")
 
 PATH_BERTSCORE_BASE_CSV = os.path.join("results", "csv", "base")
+PATH_BERTSCORE_DEBUG_CSV = os.path.join("results", "csv", "debug")
 PATH_BERTSCORE_LIMITED_CSV = os.path.join("results", "csv", "limited")
+
 
 
 

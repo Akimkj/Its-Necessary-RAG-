@@ -314,16 +314,24 @@ def plot_question_heatmap(csv_dir, metric):
 
     im = ax.imshow(matrix, cmap="RdYlGn", aspect="auto", vmin=0.0, vmax=1.0)
     cbar = plt.colorbar(im, ax=ax, fraction=0.02, pad=0.02)
-    cbar.set_label(metric_label, fontsize=14)
-    cbar.ax.tick_params(labelsize=12)
+    cbar.set_label(metric_label, fontsize=18)
+    cbar.ax.tick_params(labelsize=16)
 
     for label in cbar.ax.get_yticklabels():
         label.set_fontweight('bold')
 
     # Eixo Y — modelos
     ax.set_yticks(range(len(models)))
-    ax.set_yticklabels(models, fontsize=14)
-    ax.set_ylabel("Model", fontsize=14)
+    ax.set_yticklabels(
+        models,
+        fontsize=18,
+        fontweight="bold"
+    )
+    ax.set_ylabel(
+        "Model",
+        fontsize=18,
+        fontweight="bold"
+    )
 
     # Mostrar ticks a cada 5 questões
     step = max(1, n_q // 15)

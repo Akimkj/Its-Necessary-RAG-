@@ -263,7 +263,7 @@ def plot_line(df, metrics, stats):
 
 
 # GRÁFICO 6 — Question Heatmap (modelo × questão)
-def plot_question_heatmap(csv_dir, metric):
+def plot_question_heatmap(csv_dir, metric, version):
     """
     Lê os CSVs individuais de cada LLM em csv_dir e gera um heatmap
     onde linhas = modelos e colunas = questões, colorido pela métrica escolhida.
@@ -357,7 +357,7 @@ def plot_question_heatmap(csv_dir, metric):
     # Grade fina entre células
     ax.set_xticks(np.arange(-0.5, n_q, 1),        minor=True)
     ax.set_yticks(np.arange(-0.5, len(models), 1), minor=True)
-    ax.grid(which="minor", color="white", linewidth=0.5)
+    ax.grid(which="minor", color=(1, 1, 1, 0.18), linewidth=0.2)
     ax.tick_params(which="minor", bottom=False, left=False)
 
     # Separadores horizontais entre modelos
@@ -366,7 +366,7 @@ def plot_question_heatmap(csv_dir, metric):
 
     
     fig.tight_layout()
-    _save(fig, f"question_heatmap_{metric}v3.pdf")
+    _save(fig, f"question_heatmap_{metric}{version}.pdf")
 
 
 # ──────────────────────────────────────────────────────────
@@ -409,7 +409,7 @@ HEATMAP_METRIC_OPTIONS = {
 }
 
 
-def run_charts(stats_csv_path, csv_dir=None):
+def run_charts(stats_csv_path, csv_dir=None, version="v1"):
     """
     Exibe o submenu de gráficos e gera o gráfico escolhido.
 
@@ -439,7 +439,7 @@ def run_charts(stats_csv_path, csv_dir=None):
         hm_op  = int(input("Escolha a métrica: "))
         metric = HEATMAP_METRIC_OPTIONS.get(hm_op, "F1")
         print(f"\nGerando Question Heatmap ({METRIC_NAMES[metric]})...")
-        plot_question_heatmap(csv_dir, metric)
+        plot_question_heatmap(csv_dir, metric, version)
         return
 
     # ── Para os demais gráficos: precisa do CSV de estatísticas ──
@@ -482,7 +482,7 @@ def run_charts(stats_csv_path, csv_dir=None):
             func(df, metrics, stats)
         # Question Heatmap com F1 por padrão ao gerar tudo
         print("Gerando Question Heatmap (F1)...")
-        plot_question_heatmap(csv_dir, "F1")
+        plot_question_heatmap(csv_dir, "F1", version)
     elif c_op in CHART_OPTIONS:
         name, func = CHART_OPTIONS[c_op]
         print(f"Gerando {name}...")

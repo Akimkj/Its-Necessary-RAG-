@@ -141,7 +141,9 @@ while True:
 
     # ── Opção 3: gera gráficos a partir das estatísticas BERT ──
     elif op == 3:
-        run_charts(PATH_STATS_LIMITED_CSV, PATH_BERTSCORE_LIMITED_CSV)
+        run_charts(PATH_STATS_BASE_CSV, PATH_BERTSCORE_BASE_CSV)
+        run_charts(PATH_STATS_BASE_CSV, PATH_BERTSCORE_DEBUG_CSV, "v2")
+        run_charts(PATH_STATS_LIMITED_CSV, PATH_BERTSCORE_LIMITED_CSV, "v3")
 
     # ── Opção 4: calcula e salva as estatísticas BERT ──
     elif op == 4:

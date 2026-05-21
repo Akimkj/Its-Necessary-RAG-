@@ -15,6 +15,11 @@ EMBEDDER_MAP = {
         "file": os.path.join("src", "embedders", "all-MiniLM-L6-v2.py"),
         "function": "chunks_to_embeddings",
     },
+    2: {
+        "name": "Qwen3-VL-Embedding-2B",
+        "file": os.path.join("src", "embedders", "Qwen3-VL-Embedding-2B.py"),
+        "function": "chunks_to_embeddings",
+    },
 }
 
 def _import_embedder(option_key: int):

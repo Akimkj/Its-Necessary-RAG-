@@ -71,7 +71,8 @@ while True:
     print("3 - Gerar graficos comparativos")
     print("4 - Calcular estatisticas BERT")
     print("5 - Carregar documento no banco de dados (chunking + embedding + MongoDB)")
-    print("6 - Sair")
+    print("6 - Realizar busca semantica no banco de dados")
+    print("7 - Sair")
     op = int(input("Option: "))
 
     # ── Opção 1: gera respostas do modelo escolhido ──
@@ -151,5 +152,28 @@ while True:
     elif op == 5:
         run_ingestion_pipeline()
 
+    # ── Opção 6: Busca Semântica no MongoDB ──
     elif op == 6:
+        from src.dataBaseLoader import semantic_search
+        query = input("Digite o termo de busca semântica: ")
+        try:
+            limit = int(input("Digite a quantidade de chunks que deseja retornar: "))
+        except ValueError:
+            print("Quantidade inválida. Usando limite padrão de 5.")
+            limit = 5
+            
+        print("\nRealizando busca semântica...")
+        results = semantic_search(query, limit)
+        if not results:
+            print("Nenhum resultado retornado ou ocorreu um erro.")
+        else:
+            # Ordenar por score do maior para o menor (mais similar para o menos similar)
+            sorted_results = sorted(results, key=lambda x: x.get('score', 0.0), reverse=True)
+            print(f"\n--- Resultados da busca (ordenados por similaridade) ---")
+            for i, item in enumerate(sorted_results, 1):
+                print(f"\n[{i}] Score: {item.get('score', 0.0):.4f}")
+                print(f"Chunk:\n{item.get('chunk', 'Sem conteúdo')}")
+                print("-" * 50)
+
+    elif op == 7:
         break

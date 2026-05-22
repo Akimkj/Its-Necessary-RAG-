@@ -5,12 +5,16 @@ import uuid
 
 def chunks_to_embeddings(chunks: list[Document]) -> str:
     model = SentenceTransformer("Qwen/Qwen3-VL-Embedding-2B", trust_remote_code=True)
-    
+
     result = []
-    for chunk in chunks:
+    total = len(chunks)
+    print(f"Iniciando processamento de {total} chunks...")
+    for i, chunk in enumerate(chunks, 1):
         text = chunk.page_content
         embedding = model.encode(text).tolist()
-        
+
+        print(f"[{i}/{total}] Embeddings processados...")
+
         result.append({
             "id": str(uuid.uuid4()),
             "chunk": text,

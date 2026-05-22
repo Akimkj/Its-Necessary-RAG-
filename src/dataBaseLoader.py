@@ -41,7 +41,7 @@ def semantic_search(query: str, limit: int = 5):
     from sentence_transformers import SentenceTransformer
     
     # Inicializando o modelo para gerar o embedding da busca
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = SentenceTransformer("Qwen/Qwen3-VL-Embedding-2B", trust_remote_code=True)
     query_vector = model.encode(query).tolist()
     
     client = MongoClient(MONGO_URI)

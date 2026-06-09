@@ -11,7 +11,15 @@ MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = os.getenv("DB_NAME")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 
-model = SentenceTransformer("Qwen/Qwen3-VL-Embedding-2B", trust_remote_code=True)
+_model = None
+
+def _get_model() -> SentenceTransformer:
+    global _model
+    if _model is None:
+        print("\nCarregando o modelo Qwen3-Embedding-0.6B para busca semântica...")
+        _model = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B", trust_remote_code=True)
+        print("Modelo Qwen3-Embedding-0.6B carregado com sucesso!")
+    return _model
 
 def insert_embeddings_to_mongodb(json_data: str | list):
     if isinstance(json_data, str):
@@ -42,7 +50,9 @@ def insert_embeddings_to_mongodb(json_data: str | list):
 
 def semantic_search(query: str, limit: int = 5):    
     # Inicializando o modelo para gerar o embedding da busca
-    query_vector = model.encode([query])[0].tolist()
+    model = _get_model()
+    formatted_query = f"Instruct: Given a Python code or documentation query, retrieve relevant passages that answer the query\nQuery: {query}"
+    query_vector = model.encode([formatted_query])[0].tolist()
     
     client = MongoClient(MONGO_URI)
     db = client[DB_NAME]

@@ -1,4 +1,4 @@
-﻿"""
+"""
 ingestion_pipeline.py
 Pipeline: documento -> chunks -> embeddings -> MongoDB
 """
@@ -16,8 +16,8 @@ EMBEDDER_MAP = {
         "function": "chunks_to_embeddings",
     },
     2: {
-        "name": "Qwen3-VL-Embedding-2B",
-        "file": os.path.join("src", "embedders", "Qwen3-VL-Embedding-2B.py"),
+        "name": "Qwen3-Embedding-0.6B",
+        "file": os.path.join("src", "embedders", "Qwen3-Embedding-0.6B.py"),
         "function": "chunks_to_embeddings",
     },
 }

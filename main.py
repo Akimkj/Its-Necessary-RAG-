@@ -1,4 +1,4 @@
-﻿import os
+import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -155,6 +155,8 @@ while True:
     # ── Opção 6: Busca Semântica no MongoDB ──
     elif op == 6:
         from src.dataBaseLoader import semantic_search
+        from src.rerankers import rerank_chunks
+        
         query = input("Digite o termo de busca semântica: ")
         try:
             limit = int(input("Digite a quantidade de chunks que deseja retornar: "))
@@ -174,6 +176,20 @@ while True:
                 print(f"\n[{i}] Score: {item.get('score', 0.0):.4f}")
                 print(f"Chunk:\n{item.get('chunk', 'Sem conteúdo')}")
                 print("-" * 50)
+                
+            apply_rerank = input("\nDeseja aplicar o reranking com Qwen3-Reranker-0.6B? (s/n): ").strip().lower()
+            if apply_rerank == 's':
+                rerank_query = input("Digite a pergunta para o reranking (pressione Enter para usar a mesma busca): ").strip()
+                if not rerank_query:
+                    rerank_query = query
+                    
+                reranked_results = rerank_chunks(rerank_query, sorted_results)
+                
+                print(f"\n--- Resultados após o Reranking com Qwen3-Reranker-0.6B ---")
+                for i, item in enumerate(reranked_results, 1):
+                    print(f"\n[{i}] Novo Score: {item.get('score', 0.0):.4f}")
+                    print(f"Chunk:\n{item.get('chunk', 'Sem conteúdo')}")
+                    print("-" * 50)
 
     elif op == 7:
         break
